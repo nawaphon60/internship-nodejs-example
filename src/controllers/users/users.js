@@ -2,13 +2,13 @@
 const Users = require('./../../models/users')
 const Utils = require('./../../utils')
 
-class UsersController{
+class UsersController {
 
-    constructor(){
+    constructor() {
 
     }
 
-    async search(req, res){
+    async search(req, res) {
         try {
 
             let input = req.body
@@ -16,8 +16,8 @@ class UsersController{
             input.page = input.page || 1
             input.per_page = input.per_page || 10
 
-            let users_query = Users.query((qb)=>{
-                if(input.search){
+            let users_query = Users.query((qb) => {
+                if (input.search) {
                     qb.where('name', 'LIKE', `%${input.search}%`)
                     qb.orWhere('email', 'LIKE', `%${input.search}%`)
                 }
@@ -38,7 +38,7 @@ class UsersController{
                 data: users_rs
             })
 
-        }catch(err){
+        } catch (err) {
             console.log(err.stack)
             res.status(400).json({
                 message: err.message
@@ -46,7 +46,7 @@ class UsersController{
         }
     }
 
-    async createUser(req, res){
+    async createUser(req, res) {
         try {
 
             let input = req.body
@@ -54,32 +54,33 @@ class UsersController{
             input.name = input.name || ""
             input.role = input.role || "member"
 
-            if(!new Utils().validateEmail(input.email)){
+            if (!new Utils().validateEmail(input.email)) {
                 throw new Error("Invalid email.")
             }
 
-            if(!input.name){
+            if (!input.name) {
                 throw new Error("Require name.")
             }
 
-            if(!input.password){
+            if (!input.password) {
                 throw new Error("Require password.")
             }
 
             let password = new Utils().encryptPassword(input.password)
-            
+
             // check 
             let user = await Users.where('email', input.email).fetch()
-            if(user){
+            if (user) {
                 throw new Error("มีผู้ใช้งานนี้แล้ว.")
             }
-            
+
             let role = "member"
-            
-            if(req.authen && req.authen.role == "admin"){
+
+            if (req.authen && req.authen.role == "admin") {
                 role = input.role
             }
-           await new Users({
+
+            await new Users({
                 email: input.email,
                 name: input.name,
                 password: password,
@@ -90,7 +91,7 @@ class UsersController{
                 message: "complete"
             })
 
-        }catch(err){
+        } catch (err) {
             console.log(err.stack)
             res.status(400).json({
                 message: err.message
@@ -98,38 +99,38 @@ class UsersController{
         }
     }
 
-    async updateUser(req, res){
+    async updateUser(req, res) {
         try {
 
             let input = req.body
             let authen = req.authen
             console.log(authen.id, req.params.user_id)
             let user_id = req.params.user_id
-            if(authen.id != user_id){
+            if (authen.id != user_id) {
                 throw new Error("ไม่มีสิทธิ์เข้าถึง.")
             }
 
             input.name = input.name || ""
-            if(!input.name){
+            if (!input.name) {
                 throw new Error("Require name.")
             }
 
             // check 
             let user = await Users.where('id', user_id).fetch()
 
-            if(!user){
+            if (!user) {
                 throw new Error("ไม่มีผู้ใช้งานนี้.")
             }
 
             await user.save({
                 name: input.name
             }, { methods: "update", patch: true })
-            
+
             res.status(200).json({
                 message: "complete"
             })
 
-        }catch(err){
+        } catch (err) {
             console.log(err.stack)
             res.status(400).json({
                 message: err.message
@@ -137,34 +138,33 @@ class UsersController{
         }
     }
 
-    async deleteUser(req, res){
+    async deleteUser(req, res) {
         try {
             let authen = req.authen
             let user_id = req.params.user_id
-            
-            if(authen.id != user_id ){
+
+            if (authen.id != user_id) {
                 throw new Error("ไม่มีสิทธิ์เข้าถึง.")
             }
             // check 
             let user = await Users.where('id', user_id).fetch()
-            if(!user){
+            if (!user) {
                 throw new Error("ไม่มีผู้ใช้งานนี้.")
             }
 
             await user.destroy({ require: false })
-            
+
             res.status(200).json({
                 message: "complete"
             })
 
-        }catch(err){
+        } catch (err) {
             console.log(err.stack)
             res.status(400).json({
                 message: err.message
             })
         }
     }
-
 }
 
 module.exports = UsersController
