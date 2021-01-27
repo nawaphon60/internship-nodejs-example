@@ -165,6 +165,36 @@ class UsersController {
             })
         }
     }
+
+    async getByID(req, res) {
+        try {
+            let user_id = req.params.user_id
+
+            let users_query = Users.query((qb) => {
+                if (user_id) {
+                    qb.where('id', '=', `${user_id}`)
+                }
+            })
+
+            let users = await users_query.fetchPage({
+                columns: ['id', 'name', 'email', 'created_at', 'updated_at', 'role']
+            })
+
+            let users_rs = users.toJSON()
+            let count = await users_query.count()
+
+            res.status(200).json({
+                count: count,
+                data: users_rs
+            })
+
+        } catch (err) {
+            console.log(err.stack)
+            res.status(400).json({
+                message: err.message
+            })
+        }
+    }
 }
 
 module.exports = UsersController

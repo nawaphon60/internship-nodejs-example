@@ -9,6 +9,8 @@ app.get('', (req, res)=>{
 
 app.post('/search', new Users().search)
 
+app.get('/profile/:user_id', new Users().getByID)
+
 app.post('/create', [
     new AuthenMiddleware().accessAll
 ],new Users().createUser)
