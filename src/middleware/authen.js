@@ -8,10 +8,10 @@ class AuthenMiddleware{
         try {
             req.headers['authorization'] = req.headers['authorization'] || ""
             let token = req.headers['authorization'].replace(/Bearer /, "")
-            console.log('token', token)
+            // console.log('token =', token)
             var cert = fs.readFileSync(`${process.cwd()}/cert/public.key`);
             let decoded = jwt.verify(token, cert);
-
+            // console.log(decoded);
             // add request data
             req.authen = decoded
 
@@ -28,7 +28,7 @@ class AuthenMiddleware{
         try {
             req.headers['authorization'] = req.headers['authorization'] || ""
             let token = req.headers['authorization'].replace(/Bearer /, "")
-            console.log('token', token)
+            console.log('token =', token)
             var cert = fs.readFileSync(`${process.cwd()}/cert/public.key`);
             let decoded = jwt.verify(token, cert);
 

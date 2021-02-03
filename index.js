@@ -5,6 +5,15 @@ var logger = require('morgan');
 require('dotenv').config() /// โหลด config จาก file .env ให้เรียกใช้ใน process.env ได้
 const PORT = process.env.PORT || 3000 //ใช้ port จาก .env ถ้าไม่มีใน .env ให้ใช้ PORT = 3000
 const app = express()
+var admin = require("firebase-admin");
+
+var serviceAccount = require("./cert/userdataminiproject-firebase-adminsdk-w4l9e-0a03970cba.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://userdataminiproject.firebaseio.com",
+  storageBucket: "gs://userdataminiproject.appspot.com/"
+});
 
 app.use(logger('dev')); // log call api
 app.use(express.json()) // set ให้ Request body ให้รู้จัก data แบบ json (parsing application/json) https://expressjs.com/en/4x/api.html#req.body
