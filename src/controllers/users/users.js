@@ -6,9 +6,7 @@ var admin = require("firebase-admin");
 
 class UsersController {
 
-    constructor() {
-
-    }
+    constructor() {}
 
     async search(req, res) {
         try {
@@ -71,9 +69,10 @@ class UsersController {
             }
 
             let password = new Utils().encryptPassword(input.password)
-
+            
             // check 
             let user = await Users.where('email', input.email).fetch()
+            
             if (user) {
                 throw new Error("มีผู้ใช้งานนี้แล้ว.")
             }
@@ -89,6 +88,7 @@ class UsersController {
                 name: input.name,
                 password: password,
                 role: role,
+                work_id: input.work_id,
                 image: input.image
             }).save()
 
@@ -323,15 +323,15 @@ class UsersController {
         try {
             let image = req.file.buffer
             let filename = `${Date.now()}-${req.file.originalname}`
-            let save_patch = `${process.cwd()}/public/temp/${filename}`
+            let save_path = `${process.cwd()}/public/temp/${filename}`
 
             fs.writeFileSync(`${process.cwd()}/public/temp/${filename}`, image)
             let upload = admin.storage().bucket()
 
-            let res_upload = await upload.upload(save_patch,{
+            let res_upload = await upload.upload(save_path,{
 
             })
-            fs.unlinkSync(save_patch)
+            fs.unlinkSync(save_path)
             // console.log();
             // res_upload[0]
             
